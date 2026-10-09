@@ -4,15 +4,15 @@
 
 Author: Ryan Reilly Oduory
 
-- My partner is Trevor Fidel Nyongesa, [portfolio link](https://github.com/TrevorFidel/Database-HSBI/edit/main/README.md)
+- My partner is Trevor Fidel Nyongesa, [portfolio link](https://github.com/TrevorFidel/Database-HSBI/blob/main/README.md)
 
 - My partner is Trevor M Kiio, [portfolio link](https://github.com/tkiio/Databases-Portfolio.git/README.md)
 
 I Like the **Trevors**
 
 In my team for the final project, I also had the following members:
-- <replace these pointy brackets with their full name>, [portfolio link](https://github.com/partner/iot-portfolio)
-- <replace these pointy brackets with their full name>, [portfolio link](https://github.com/partner/iot-portfolio)
+- Someone 1, [portfolio link](https://github.com/partner/iot-portfolio)
+- Someone 2, [portfolio link](https://github.com/partner/iot-portfolio)
 
 Our team final project repository is [here](https://github.com/somewhere/final-iot-project)
 
