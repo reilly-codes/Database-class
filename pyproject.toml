@@ -1,0 +1,23 @@
+[project]
+name = "database-class"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Reilly Oduory", email = "jroduory@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "datasette>=0.65.5",
+    "duckdb>=1.5.6",
+    "pydantic>=2.14.1",
+    "sqlalchemy>=2.1.4",
+    "sqlite-utils>=4.2.1",
+]
+
+[project.scripts]
+database-class = "database_class:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
