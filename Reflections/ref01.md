@@ -1,16 +1,7 @@
 # Reflection 1 in Module 1
 
-- What is your take-away, what do you want to remember, what would be your advice?
-  Take-away can be small summary, but better outstanding points.
-- What was good?
-- What was difficult, where did you struggle?
-- Was there any good/fun “struggling”/exploration?
-  Any show stoppers – anything where you should reach out to peers or instructors? 
-- How was your interaction with peers/instructors?
-- Help and extra work
-  - Who helped you, gave feedback, was it valuable?
-  - Who did you help, gave feedback to?
-  - Did you present, implement, made a PR, or fix something that was crucial for the class in itself?
+This being my first database class, I managed to deepen my understanding of databases and how to choose what type of database to use for a given problem. I learnt about embedded databases and client-server databases. I also managed to engage an online sql game that was really fun and I learnt about joins which were mostly guesses but I now understand how they work and I managed to complete the game. I learnt about UV as a package manager as I used to use pip as my default package manager. I learnt there tools I can use to view my data in table format called datasette(which I can use on my browser). The most difficult part of this class was just understanding the expected outcomes and the required deliverables required by the proffesor. Moreover the writing of reflections which is not a method I am used to going about as I learn which makes me understand what I have managed to learn and put it  down on paper. 
 
+For the queries to get the machines that meet a given condition I used Gemini 3.1 Pro to generate the sqlite query which worked immediately and since this was done a few hours before the deadline I wasn't able to play around with different models to see which one is more accurate. I also ran the query against the database to verify the results and it was a match.
 
-Used Gemini3.1 Pro and it got it right.
+**Yours Truly Trainn**
