@@ -11,3 +11,6 @@
   - Who helped you, gave feedback, was it valuable?
   - Who did you help, gave feedback to?
   - Did you present, implement, made a PR, or fix something that was crucial for the class in itself?
+
+
+Used Gemini3.1 Pro and it got it right.

@@ -3,3 +3,6 @@
 .zed/
 .code/
 .venv/
+*.parquet
+.env
+__pycache__/
