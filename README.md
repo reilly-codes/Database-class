@@ -6,7 +6,7 @@ Author: Ryan Reilly Oduory
 
 - My partner is Trevor Fidel Nyongesa, [portfolio link](https://github.com/TrevorFidel/Database-HSBI/blob/main/README.md)
 
-- My partner is Trevor M Kiio, [portfolio link](https://github.com/tkiio/Databases-Portfolio.git/README.md)
+- My partner is Trevor M Kiio, [portfolio link](https://github.com/tkiio/Databases-Portfolio)
 
 I Like the **Trevors**
 
@@ -20,12 +20,17 @@ My personal profile and expectations, you can find [here](Module01/README.md#tas
 
 ## Table of Contents
 
-- [Module 1: IoT Introduction](Module01/README.md), 
+- [Module 1: Introduction & Local-First](Module01/README.md), 
   [Reflection 1](Reflections/ref01.md)
-- [Module 2: Hardware and Basic Electronics](Module02/README.md),
-  [Reflection 2](Reflections/ref02.md), [Reflection 3](Reflections/ref03.md)
-- ...
+- [Module 2: Data Contracts & Legacy Schemas](Module02/README.md),
+  [Reflection 2](Reflections/ref02.md)
+- [Module 3: LLM-Assisted SQL & Query Profiling](Module03/README.md),
+  [Reflection 3](Reflections/ref03.md)
+- [Module 4: Data Integrity, Constraints & Edge Triggers](Module04/README.md),
+  [Reflection 4](Reflections/ref04.md)
+- [Module 5: Normalization vs. Denormalization](Module05/README.md),
+  [Reflection 5](Reflections/ref05.md)
 
-## Miscellanious
+## Miscellaneous
 
 - [Hardware in my/our possession](Hardware/README.md)

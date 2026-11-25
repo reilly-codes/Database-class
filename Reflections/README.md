@@ -17,3 +17,13 @@ As a reminder, we expect the following in a reflection:
   - Who helped you, gave feedback, was it valuable?
   - Who did you help, gave feedback to?
   - Did you present, implement, made a PR, or fix something that was crucial for the class in itself?
+
+---
+
+## Logbook Entries
+
+- [Reflection 1 (Module 1)](ref01.md)
+- [Reflection 2 (Module 2)](ref02.md)
+- [Reflection 3 (Module 3)](ref03.md)
+- [Reflection 4 (Module 4)](ref04.md)
+- [Reflection 5 (Module 5)](ref05.md)
