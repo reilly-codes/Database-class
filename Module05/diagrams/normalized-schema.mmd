@@ -1,0 +1,26 @@
+erDiagram
+    MACHINE {
+        string machine_id PK
+        string site
+    }
+    
+    PART {
+        string part_no PK
+        decimal part_price
+    }
+    
+    JOB {
+        int job_id PK
+        string machine_id FK
+        string technician
+        date done_on
+    }
+    
+    JOB_PART {
+        int job_id FK
+        string part_no FK
+    }
+    
+    MACHINE ||--o{ JOB : "located_at"
+    JOB ||--o{ JOB_PART : "uses"
+    PART ||--o{ JOB_PART : "used_in"

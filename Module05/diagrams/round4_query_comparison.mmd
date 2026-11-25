@@ -1,0 +1,65 @@
+graph TB
+    subgraph "Normalized Query Execution: 4-Way Join"
+        N1["<b>Step 1: SCAN job Table</b><br/>Read 20,000 job rows<br/>Apply filter: done_on >= '2026-03-01'<br/>Result: ~6,667 jobs (last 30 of 90 days)"]
+        
+        N2["<b>Step 2: SEARCH machine Table</b><br/>For each of 6,667 jobs:<br/>- Look up machine_id in machine table<br/>- machine table: 50 rows (tiny, fully cached)<br/>- Add 'site' column<br/>Result: 6,667 rows with site"]
+        
+        N3["<b>Step 3: SEARCH job_part Table</b><br/>For each of 6,667 jobs:<br/>- Find all parts used (10 parts per job)<br/>- Uses covering index (no table lookup)<br/>Result: 66,670 job_part rows"]
+        
+        N4["<b>Step 4: SEARCH part Table</b><br/>For each of 66,670 job_part rows:<br/>- Look up part_no in part table<br/>- part table: 40 rows (tiny, fully cached)<br/>- Add 'part_price' column<br/>Result: 66,670 rows with price"]
+        
+        N5["<b>Step 5: GROUP BY</b><br/>Create temp B-tree<br/>Group by (machine_id, technician)<br/>SUM(part_price) per group<br/>Result: ~350 aggregate rows"]
+    end
+    
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    
+    subgraph "Denormalized Query Execution: Single Scan"
+        D1["<b>Step 1: SCAN report_jobpart Table</b><br/>Sequential scan of 200,000 rows<br/>Apply filter: done_on >= '2026-03-01' during scan<br/>site, technician, part_price already present<br/>Result: ~66,670 filtered rows"]
+        
+        D2["<b>Step 2: GROUP BY</b><br/>Create temp B-tree<br/>Group by (machine_id, technician)<br/>SUM(part_price) per group<br/>Result: ~350 aggregate rows"]
+    end
+    
+    D1 --> D2
+    
+    subgraph "COMPARISON"
+        C1["<b>Normalized</b><br/>Operations: 5 steps<br/>Tables accessed: 4<br/>Rows scanned: 86,670 total<br/>(20k + 6.6k + 66.6k + 66.6k)<br/>Lookups: 73,337 (mostly cached)<br/>Working set: 66,670 rows"]
+        
+        C2["<b>Denormalized</b><br/>Operations: 2 steps<br/>Tables accessed: 1<br/>Rows scanned: 200,000<br/>(sequential, all in one table)<br/>Lookups: 0<br/>Working set: 66,670 rows"]
+        
+        C3["<b>KEY INSIGHT</b><br/>Normalized scans fewer rows (86k vs 200k)<br/>but does more lookups (73k vs 0)<br/><br/>Winner depends on cache:<br/>- Cold cache: Denormalized (fewer operations)<br/>- Hot cache: Normalized (lookups are free)"]
+    end
+    
+    N5 --> C1
+    D2 --> C2
+    C1 --> C3
+    C2 --> C3
+    
+    subgraph "Why Cache Matters"
+        E1["<b>Run 1 (Cold Cache)</b><br/>machine/part not in cache<br/>Lookups require disk I/O<br/>Denormalized wins: 43ms vs 52ms"]
+        
+        E2["<b>Run 2 (Hot Cache)</b><br/>machine/part fully cached<br/>Lookups are memory reads<br/>Normalized wins: 39ms vs 48ms"]
+        
+        E3["<b>Cache Efficiency</b><br/>machine (50 rows) = ~4 KB<br/>part (40 rows) = ~3 KB<br/>Total: ~7 KB fits in L2 cache!<br/><br/>report_jobpart (66k rows) = ~5 MB<br/>Exceeds L3 cache, uses RAM"]
+    end
+    
+    C3 --> E1
+    C3 --> E2
+    E1 --> E3
+    E2 --> E3
+    
+    style N1 fill:#e5ffe5,stroke:#00aa00
+    style N2 fill:#e5ffe5,stroke:#00aa00
+    style N3 fill:#e5ffe5,stroke:#00aa00
+    style N4 fill:#e5ffe5,stroke:#00aa00
+    style N5 fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style D1 fill:#fff5e5,stroke:#ff9900
+    style D2 fill:#ffeecc,stroke:#ff9900,stroke-width:2px
+    style C1 fill:#e5f2ff,stroke:#0066cc
+    style C2 fill:#fff5e5,stroke:#ff9900
+    style C3 fill:#ffffcc,stroke:#666666,stroke-width:3px
+    style E1 fill:#ffeecc,stroke:#ff9900
+    style E2 fill:#ccffcc,stroke:#00aa00
+    style E3 fill:#e5f2ff,stroke:#0066cc,stroke-width:2px

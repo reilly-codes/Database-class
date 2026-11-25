@@ -1,0 +1,43 @@
+graph LR
+    subgraph "Run 1: Cold Start (No Cache)"
+        A1["<b>Normalized Query</b><br/>4-way join<br/>Load machine (50 rows)<br/>Load part (40 rows)<br/>Scan job_part (67k rows)<br/>Time: 45-65ms"]
+        
+        B1["<b>Denormalized Query</b><br/>Single table scan<br/>Scan report_jobpart (67k rows)<br/>No joins needed<br/>Time: 35-55ms"]
+    end
+    
+    subgraph "Run 2: Hot Cache (Tables Cached)"
+        A2["<b>Normalized Query</b><br/>machine & part IN CACHE ✅<br/>Only job_part scanned<br/>Fast lookups to cached tables<br/>Time: 35-50ms<br/><b>FASTER on 2nd run</b>"]
+        
+        B2["<b>Denormalized Query</b><br/>Still scans 67k rows<br/>Larger working set<br/>Cache less effective<br/>Time: 40-60ms<br/><b>SLOWER on 2nd run</b>"]
+    end
+    
+    A1 -.->|"Cache populated"| A2
+    B1 -.->|"Cache populated"| B2
+    
+    subgraph "Why the Difference?"
+        C["<b>Cache Behavior</b><br/>Normalized: Small tables (90 rows) fit in cache<br/>Denormalized: Large table (67k rows) thrashes cache<br/>SQLite page cache favors small lookup tables"]
+        
+        D["<b>The Lesson</b><br/>Denormalization ≠ Always Faster<br/>Cache locality matters<br/>Small dimension tables = efficient caching<br/>Large fact tables = sequential scans"]
+    end
+    
+    A2 --> C
+    B2 --> C
+    C --> D
+    
+    subgraph "Query Plans Compared"
+        E["<b>Normalized Plan</b><br/>SCAN job<br/>SEARCH machine (PK)<br/>SEARCH job_part (index)<br/>SEARCH part (PK)<br/>TEMP B-TREE (GROUP BY)<br/><b>4 operations</b>"]
+        
+        F["<b>Denormalized Plan</b><br/>SCAN report_jobpart<br/>TEMP B-TREE (GROUP BY)<br/><b>1 operation</b><br/><b>But larger scan!</b>"]
+    end
+    
+    A1 -.-> E
+    B1 -.-> F
+    
+    style A1 fill:#ffffcc,stroke:#ffaa00,stroke-width:2px
+    style B1 fill:#ffffcc,stroke:#ffaa00,stroke-width:2px
+    style A2 fill:#ccffcc,stroke:#00aa00,stroke-width:3px
+    style B2 fill:#ffcccc,stroke:#ff6666,stroke-width:3px
+    style C fill:#e5f2ff,stroke:#0066cc
+    style D fill:#fff0f0,stroke:#ff6666,stroke-width:2px
+    style E fill:#f0f0f0,stroke:#666666
+    style F fill:#f0f0f0,stroke:#666666

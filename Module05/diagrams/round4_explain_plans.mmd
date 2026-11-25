@@ -1,0 +1,73 @@
+graph TB
+    subgraph "EXPLAIN QUERY PLAN - Normalized (4-Way Join)"
+        NP["<b>Normalized Query Plan Output</b><br/><pre>QUERY PLAN<br/>|--SCAN job AS j<br/>|--SEARCH machine AS m USING INTEGER PRIMARY KEY (rowid=?)<br/>|--SEARCH job_part AS jp USING COVERING INDEX sqlite_autoindex_job_part_1 (job_id=?)<br/>|--SEARCH part AS p USING INTEGER PRIMARY KEY (rowid=?)<br/>`--USE TEMP B-TREE FOR GROUP BY</pre>"]
+        
+        N1["<b>SCAN job AS j</b><br/>Type: Sequential scan<br/>Rows: 20,000<br/>Filter: done_on >= '2026-03-01'<br/>Output: ~6,667 job rows"]
+        
+        N2["<b>SEARCH machine AS m</b><br/>Type: Index lookup (primary key)<br/>Rows: 50 (tiny)<br/>For each job: Find machine row<br/>Cost: ~6,667 lookups into 50-row table<br/>Cached: Almost certainly (50 rows = 4 KB)"]
+        
+        N3["<b>SEARCH job_part AS jp</b><br/>Type: Covering index scan<br/>Rows: 200,000 (index size)<br/>Join key: job_id<br/>Expand: 6,667 jobs × 10 parts = 66,670 rows<br/>Note: Covering = all columns in index, no table access"]
+        
+        N4["<b>SEARCH part AS p</b><br/>Type: Index lookup (primary key)<br/>Rows: 40 (tiny)<br/>For each job_part: Find part row<br/>Cost: ~66,670 lookups into 40-row table<br/>Cached: Almost certainly (40 rows = 3 KB)"]
+        
+        N5["<b>USE TEMP B-TREE</b><br/>Group by: (machine_id, technician)<br/>Aggregate: SUM(part_price)<br/>Cost: Same in both queries (necessary)"]
+    end
+    
+    NP --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    
+    subgraph "EXPLAIN QUERY PLAN - Denormalized (Single Table)"
+        DP["<b>Denormalized Query Plan Output</b><br/><pre>QUERY PLAN<br/>|--SCAN report_jobpart<br/>`--USE TEMP B-TREE FOR GROUP BY</pre>"]
+        
+        D1["<b>SCAN report_jobpart</b><br/>Type: Sequential scan<br/>Rows: 200,000 (full table)<br/>Filter: done_on >= '2026-03-01' applied during scan<br/>Output: ~66,670 rows<br/>Note: All columns (site, tech, price) already present"]
+        
+        D2["<b>USE TEMP B-TREE</b><br/>Group by: (machine_id, technician)<br/>Aggregate: SUM(part_price)<br/>Cost: Same as normalized"]
+    end
+    
+    DP --> D1
+    D1 --> D2
+    
+    subgraph "OPERATION COUNT COMPARISON"
+        OC1["<b>Normalized Operations</b><br/>1. SCAN job (filter rows)<br/>2. SEARCH machine (6,667 lookups)<br/>3. SEARCH job_part (expand to parts)<br/>4. SEARCH part (66,670 lookups)<br/>5. TEMP B-TREE (group)<br/><br/><b>Total: 4 table operations + 1 aggregation</b>"]
+        
+        OC2["<b>Denormalized Operations</b><br/>1. SCAN report_jobpart (filter + expand)<br/>2. TEMP B-TREE (group)<br/><br/><b>Total: 1 table operation + 1 aggregation</b>"]
+        
+        OC3["<b>The Insight</b><br/>More operations ≠ slower<br/>Small lookups into cached tables = near-instant<br/>~73,000 lookups mostly hit cache = ~5 ms total<br/>Scanning 200,000 rows = ~10 ms (sequential)<br/><br/><b>Winner: Depends on cache state</b>"]
+    end
+    
+    N5 --> OC1
+    D2 --> OC2
+    OC1 --> OC3
+    OC2 --> OC3
+    
+    subgraph "Visual Timeline Comparison"
+        T1["<b>Normalized Timeline</b><br/><pre>Time (ms)<br/>│<br/>│   ████░░░░░░░░░░░░░░░░░░░░░░  52 ms Total<br/>│   │<br/>│   ├─ Scan job: 15 ms<br/>│   ├─ Lookup machine: 2 ms (cached)<br/>│   ├─ Scan job_part: 20 ms<br/>│   ├─ Lookup part: 5 ms (cached)<br/>│   └─ Group by: 10 ms<br/>│</pre>"]
+        
+        T2["<b>Denormalized Timeline</b><br/><pre>Time (ms)<br/>│<br/>│   ███░░░░░░░░░░░░░░░░░░░░░░░  43 ms Total<br/>│   │<br/>│   ├─ Scan table: 33 ms<br/>│   └─ Group by: 10 ms<br/>│</pre>"]
+        
+        T3["<b>What Changes Run 2?</b><br/><b>Normalized:</b><br/>- machine lookup: 2 ms → < 0.1 ms (cached)<br/>- part lookup: 5 ms → < 0.1 ms (cached)<br/>- New total: 39 ms (25% faster)<br/><br/><b>Denormalized:</b><br/>- Table scan: 33 ms → 38 ms (cache misses)<br/>- New total: 48 ms (11% slower)<br/><br/><b>Winner flips!</b>"]
+    end
+    
+    OC3 --> T1
+    OC3 --> T2
+    T1 --> T3
+    T2 --> T3
+    
+    style NP fill:#e5f2ff,stroke:#0066cc,stroke-width:3px
+    style N1 fill:#e5ffe5,stroke:#00aa00
+    style N2 fill:#e5ffe5,stroke:#00aa00
+    style N3 fill:#e5ffe5,stroke:#00aa00
+    style N4 fill:#e5ffe5,stroke:#00aa00
+    style N5 fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style DP fill:#fff5e5,stroke:#ff9900,stroke-width:3px
+    style D1 fill:#ffeecc,stroke:#ff9900
+    style D2 fill:#ffeecc,stroke:#ff9900,stroke-width:2px
+    style OC1 fill:#e5f2ff,stroke:#0066cc
+    style OC2 fill:#fff5e5,stroke:#ff9900
+    style OC3 fill:#ffffcc,stroke:#666666,stroke-width:3px
+    style T1 fill:#ccffcc,stroke:#00aa00
+    style T2 fill:#ffeecc,stroke:#ff9900
+    style T3 fill:#fff0f0,stroke:#ff0000,stroke-width:3px

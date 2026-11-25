@@ -1,0 +1,95 @@
+graph TB
+    subgraph "THE NORMALIZATION SPECTRUM"
+        S["<b>Normalization is not binary — it's a spectrum</b><br/>Trade redundancy ↔ read performance based on workload"]
+    end
+    
+    subgraph "LEFT: Full 3NF (No Redundancy)"
+        L1["<b>Design: Full 3NF</b><br/>Separate tables connected by FKs<br/>machine(machine_id, site)<br/>part(part_no, part_price)<br/>job(job_id, machine_id, tech)<br/>job_part(job_id, part_no)"]
+        
+        L2["<b>Characteristics</b><br/>✅ Each fact stored once<br/>✅ No redundancy<br/>✅ Data integrity enforced<br/>✅ Updates touch 1 row<br/>❌ Queries need joins"]
+        
+        L3["<b>Examples from Course</b><br/>- Module 2 repaired schema<br/>- Module 3 customer/orders<br/>- Your Round 3 schema<br/>- Banking systems<br/>- E-commerce catalogs"]
+    end
+    
+    S --> L1
+    L1 --> L2
+    L2 --> L3
+    
+    subgraph "CENTER-LEFT: Mild Denormalization"
+        CL1["<b>Design: Selective Copying</b><br/>Copy rarely-changing lookups<br/>onto high-volume tables<br/><br/>Example:<br/>session(session_id, user_id,<br/>        username, created_at)<br/>        ↑ username copied"]
+        
+        CL2["<b>Characteristics</b><br/>✅ Avoid joins on hot paths<br/>✅ Fast single-row reads<br/>⚠️ Small redundancy<br/>❌ Updates affect multiple rows<br/>✓ Acceptable if rarely changes"]
+        
+        CL3["<b>Examples</b><br/>- Module 1 readings (machine name)<br/>- User dashboards (cache username)<br/>- Audit logs (copy user email)<br/>- Order history (product name at purchase)"]
+    end
+    
+    L3 --> CL1
+    CL1 --> CL2
+    CL2 --> CL3
+    
+    subgraph "CENTER-RIGHT: Aggressive Denormalization"
+        CR1["<b>Design: Flat Fact Table</b><br/>Copy dimensions onto every row<br/><br/>Example:<br/>report_jobpart(job_id,<br/>  machine_id, site, ← copied<br/>  technician, ← copied<br/>  part_no, part_price) ← copied"]
+        
+        CR2["<b>Characteristics</b><br/>✅ No joins needed<br/>✅ Fast aggregates<br/>❌ High redundancy (2-5× storage)<br/>❌ Update anomalies return<br/>❌ Must rebuild/refresh<br/>⚠️ Staleness risk"]
+        
+        CR3["<b>Examples</b><br/>- Your Round 4 report_jobpart<br/>- BI staging tables<br/>- Reporting dashboards<br/>- Search indexes<br/>- Analytics pre-aggregations"]
+    end
+    
+    CL3 --> CR1
+    CR1 --> CR2
+    CR2 --> CR3
+    
+    subgraph "RIGHT: Completely Flat (Maximum Redundancy)"
+        R1["<b>Design: Single Flat Table</b><br/>All data in one structure<br/>No relationships<br/><br/>Example:<br/>CSV file with all columns<br/>One event = one line"]
+        
+        R2["<b>Characteristics</b><br/>✅ Simplest to query<br/>✅ No schema complexity<br/>❌ Massive redundancy<br/>❌ No updates (append-only)<br/>❌ Data integrity = application's job<br/>✓ Immutable data only"]
+        
+        R3["<b>Examples</b><br/>- Log files<br/>- CSV exports<br/>- Parquet/ORC files<br/>- Data lake raw layer<br/>- Event streams"]
+    end
+    
+    CR3 --> R1
+    R1 --> R2
+    R2 --> R3
+    
+    subgraph "SPECIAL: Star Schema (Analytics Middle Ground)"
+        ST1["<b>Design: Fact + Dimensions</b><br/>Fact table: Keys + measures<br/>Dimensions: Descriptive attributes<br/><br/>fact_sales(date_key, product_key,<br/>            quantity, revenue)<br/>dim_product(product_key, name, category)<br/>dim_date(date_key, day, month, year)"]
+        
+        ST2["<b>Characteristics</b><br/>✅ Fast aggregations (narrow fact)<br/>✅ Simple joins (star pattern)<br/>✅ Update dimensions once<br/>✅ Add attributes without touching facts<br/>⚠️ Small join cost<br/>✓ Best for OLAP"]
+        
+        ST3["<b>Difference from report_jobpart</b><br/>Star: Keys in fact, join to dims<br/>Your table: Values copied into fact<br/><br/>Star update: 1 row (dimension)<br/>Your table: 4,000 rows (fact table)<br/><br/><b>Star schema is often better!</b>"]
+    end
+    
+    CL3 --> ST1
+    ST1 --> ST2
+    ST2 --> ST3
+    
+    subgraph "WHERE YOUR DESIGNS SIT"
+        Y1["<b>Module 05 Progression</b><br/><pre>Full 3NF ────────────────────────────► Flat<br/>│                                       │<br/>│                                       │<br/>├─ Round 3: Normalized (3NF)           │<br/>│  machine/part/job/job_part            │<br/>│  <b>[HERE: Transaction processing]</b>     │<br/>│                                       │<br/>├────────────► Round 4: report_jobpart │<br/>│              Aggressive denorm        │<br/>│              <b>[HERE: Dashboard queries]</b>  │<br/>│                                       │<br/>└───────────────────────────────────► │<br/>                            Flat CSV (export)</pre>"]
+        
+        Y2["<b>Decision Criteria</b><br/><b>Use 3NF if:</b><br/>- Transactional (OLTP)<br/>- Updates frequent<br/>- Integrity critical<br/><br/><b>Use Star Schema if:</b><br/>- Analytics (OLAP)<br/>- Dimensions change occasionally<br/>- Join performance acceptable<br/><br/><b>Use Aggressive Denorm if:</b><br/>- Read-only dashboards<br/>- Sub-second response needed<br/>- Rebuild strategy exists<br/><br/><b>Use Flat if:</b><br/>- Immutable events<br/>- Append-only logs<br/>- Export/interchange"]
+    end
+    
+    L1 --> Y1
+    CR1 --> Y1
+    R1 --> Y1
+    ST1 --> Y1
+    Y1 --> Y2
+    
+    style S fill:#e5f2ff,stroke:#0066cc,stroke-width:4px
+    style L1 fill:#ccffcc,stroke:#00aa00,stroke-width:3px
+    style L2 fill:#e5ffe5,stroke:#00aa00
+    style L3 fill:#f0fff0,stroke:#00aa00
+    style CL1 fill:#ffffcc,stroke:#ffaa00,stroke-width:2px
+    style CL2 fill:#fffee5,stroke:#ffaa00
+    style CL3 fill:#fffff0,stroke:#ffaa00
+    style CR1 fill:#ffeecc,stroke:#ff9900,stroke-width:2px
+    style CR2 fill:#fff5e5,stroke:#ff9900
+    style CR3 fill:#fffaf0,stroke:#ff9900
+    style R1 fill:#ffcccc,stroke:#ff6666,stroke-width:2px
+    style R2 fill:#ffe5e5,stroke:#ff6666
+    style R3 fill:#fff0f0,stroke:#ff6666
+    style ST1 fill:#e5e5ff,stroke:#6666ff,stroke-width:2px
+    style ST2 fill:#f0f0ff,stroke:#6666ff
+    style ST3 fill:#f5f5ff,stroke:#6666ff
+    style Y1 fill:#fff0f0,stroke:#ff0000,stroke-width:3px
+    style Y2 fill:#e5f2ff,stroke:#0066cc,stroke-width:2px

@@ -1,0 +1,78 @@
+graph TB
+    subgraph "Storage Breakdown: Normalized Schema (4 Tables)"
+        A1["<b>machine Table</b><br/>50 rows<br/>2 columns (machine_id, site)<br/>~5 KB"]
+        
+        A2["<b>part Table</b><br/>40 rows<br/>2 columns (part_no, part_price)<br/>~4 KB"]
+        
+        A3["<b>job Table</b><br/>20,000 rows<br/>4 columns (job_id, machine_id, technician, done_on)<br/>~800 KB"]
+        
+        A4["<b>job_part Table</b><br/>200,000 rows<br/>2 columns (job_id, part_no)<br/>~3,200 KB"]
+        
+        A5["<b>Indexes</b><br/>Primary keys + ix_flat_machine<br/>~200 KB"]
+        
+        A6["<b>Total Normalized</b><br/>~4,209 KB<br/>~4.1 MB"]
+    end
+    
+    A1 --> A6
+    A2 --> A6
+    A3 --> A6
+    A4 --> A6
+    A5 --> A6
+    
+    subgraph "Storage Breakdown: Denormalized Schema (1 Table)"
+        B1["<b>report_jobpart Table</b><br/>200,000 rows<br/>7 columns (job_id, machine_id, site, technician,<br/>part_no, part_price, done_on)<br/>~7,800 KB"]
+        
+        B2["<b>Indexes</b><br/>ix_report_machine + ix_report_done_on<br/>~500 KB"]
+        
+        B3["<b>Total Denormalized</b><br/>~8,300 KB<br/>~8.1 MB"]
+    end
+    
+    B1 --> B3
+    B2 --> B3
+    
+    subgraph "What's Being Duplicated?"
+        C1["<b>site Column</b><br/>TEXT, ~10 bytes per row<br/>200,000 rows × 10 bytes<br/>= ~2,000 KB (2 MB)<br/><br/>In normalized: 50 rows × 10 bytes = 500 bytes<br/><b>Redundancy: 4,000× storage</b>"]
+        
+        C2["<b>technician Column</b><br/>TEXT, ~7 bytes per row<br/>200,000 rows × 7 bytes<br/>= ~1,400 KB (1.4 MB)<br/><br/>In normalized: 20,000 rows × 7 bytes = 140 KB<br/><b>Redundancy: 10× storage</b>"]
+        
+        C3["<b>part_price Column</b><br/>REAL, 8 bytes per row<br/>200,000 rows × 8 bytes<br/>= ~1,600 KB (1.6 MB)<br/><br/>In normalized: 40 rows × 8 bytes = 320 bytes<br/><b>Redundancy: 5,000× storage</b>"]
+        
+        C4["<b>Total Redundancy</b><br/>~5,000 KB (~5 MB)<br/>Duplicated lookup data<br/><br/>At 20M rows: ~500 MB redundancy<br/>At 200M rows: ~5 GB redundancy"]
+    end
+    
+    B1 --> C1
+    B1 --> C2
+    B1 --> C3
+    C1 --> C4
+    C2 --> C4
+    C3 --> C4
+    
+    subgraph "Storage Comparison"
+        D["<b>Normalized: 4.1 MB</b><br/>✅ Minimal redundancy<br/>✅ Small lookup tables<br/>✅ Efficient foreign keys"]
+        
+        E["<b>Denormalized: 8.1 MB</b><br/>❌ ~2× storage<br/>❌ Duplicated dimensions<br/>❌ Redundant indexes"]
+        
+        F["<b>Storage Penalty</b><br/>+4.0 MB (+98%)<br/><br/>At production scale:<br/>100 MB → 200 MB<br/>1 GB → 2 GB"]
+    end
+    
+    A6 --> D
+    B3 --> E
+    D --> F
+    E --> F
+    
+    style A1 fill:#e5ffe5,stroke:#00aa00
+    style A2 fill:#e5ffe5,stroke:#00aa00
+    style A3 fill:#e5ffe5,stroke:#00aa00
+    style A4 fill:#e5ffe5,stroke:#00aa00
+    style A5 fill:#f0f0f0,stroke:#666666
+    style A6 fill:#ccffcc,stroke:#00aa00,stroke-width:3px
+    style B1 fill:#ffe5e5,stroke:#ff6666
+    style B2 fill:#f0f0f0,stroke:#666666
+    style B3 fill:#ffcccc,stroke:#ff6666,stroke-width:3px
+    style C1 fill:#fff5e5,stroke:#ff9900
+    style C2 fill:#fff5e5,stroke:#ff9900
+    style C3 fill:#fff5e5,stroke:#ff9900
+    style C4 fill:#ffeecc,stroke:#ff9900,stroke-width:2px
+    style D fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style E fill:#ffcccc,stroke:#ff6666,stroke-width:2px
+    style F fill:#fff0f0,stroke:#ff0000,stroke-width:3px

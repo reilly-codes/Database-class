@@ -1,0 +1,57 @@
+graph TB
+    subgraph "BEFORE: Normalized Schema (3NF)"
+        A1["<b>machine Table</b><br/>50 rows<br/>─────────────<br/>machine_id | site<br/>─────────────<br/>cnc-01 | Gütersloh<br/>cnc-02 | Gütersloh<br/>...<br/><b>Site stored ONCE per machine</b>"]
+        
+        A2["<b>part Table</b><br/>40 rows<br/>─────────────<br/>part_no | part_price<br/>─────────────<br/>P-0001 | 6.00<br/>P-0002 | 7.00<br/>...<br/><b>Price stored ONCE per part</b>"]
+        
+        A3["<b>job Table</b><br/>20,000 rows<br/>─────────────────────<br/>job_id | machine_id (FK) | technician<br/>─────────────────────<br/>1 | cnc-01 | tech-0<br/>2 | cnc-01 | tech-0<br/>...<br/><b>References machine via FK</b>"]
+        
+        A4["<b>job_part Table</b><br/>200,000 rows<br/>─────────────────────<br/>job_id (FK) | part_no (FK)<br/>─────────────────────<br/>1 | P-0001<br/>1 | P-0002<br/>2 | P-0001<br/>...<br/><b>Junction table, keys only</b>"]
+    end
+    
+    A3 -->|"Foreign Key"| A1
+    A4 -->|"Foreign Key"| A3
+    A4 -->|"Foreign Key"| A2
+    
+    subgraph "TRANSFORMATION: CREATE TABLE AS SELECT"
+        B["<b>4-Way Join Query</b><br/>SELECT j.job_id, m.machine_id, m.site,<br/>j.technician, jp.part_no, p.part_price, j.done_on<br/>FROM job j<br/>JOIN machine m ON m.machine_id = j.machine_id<br/>JOIN job_part jp ON jp.job_id = j.job_id<br/>JOIN part p ON p.part_no = jp.part_no<br/><br/><b>Materializes join result into table</b>"]
+    end
+    
+    A1 --> B
+    A2 --> B
+    A3 --> B
+    A4 --> B
+    
+    subgraph "AFTER: Denormalized Schema (report_jobpart)"
+        C["<b>report_jobpart Table</b><br/>200,000 rows<br/>────────────────────────────────────────────────<br/>job_id | machine_id | site | technician | part_no | part_price | done_on<br/>────────────────────────────────────────────────<br/>1 | cnc-01 | Gütersloh | tech-0 | P-0001 | 6.00 | 2026-01-02<br/>1 | cnc-01 | Gütersloh | tech-0 | P-0002 | 7.00 | 2026-01-02<br/>2 | cnc-01 | Gütersloh | tech-0 | P-0001 | 6.00 | 2026-01-02<br/>...<br/><br/><b>All attributes flattened into one row</b>"]
+    end
+    
+    B --> C
+    
+    subgraph "REDUNDANCY ANALYSIS"
+        D1["<b>site Column</b><br/>Gütersloh repeated ~4,000 times<br/>(for cnc-01)<br/><br/>Normalized: 1 row<br/>Denormalized: 4,000 rows<br/><b>4,000× duplication</b>"]
+        
+        D2["<b>part_price Column</b><br/>6.00 repeated ~5,000 times<br/>(for P-0001)<br/><br/>Normalized: 1 row<br/>Denormalized: 5,000 rows<br/><b>5,000× duplication</b>"]
+        
+        D3["<b>technician Column</b><br/>tech-0 repeated ~28,600 times<br/>(1/7 of 200k)<br/><br/>Normalized: stored on job<br/>Denormalized: repeated per part<br/><b>10× duplication (per job)</b>"]
+        
+        D4["<b>Total Redundancy</b><br/>~5 MB duplicated data<br/>Storage: 2× increase<br/>Update cost: 4,000× for site changes<br/><br/><b>Trade-off: Speed for Space</b>"]
+    end
+    
+    C --> D1
+    C --> D2
+    C --> D3
+    D1 --> D4
+    D2 --> D4
+    D3 --> D4
+    
+    style A1 fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style A2 fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style A3 fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style A4 fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style B fill:#e5f2ff,stroke:#0066cc,stroke-width:3px
+    style C fill:#ffffcc,stroke:#ffaa00,stroke-width:3px
+    style D1 fill:#ffe5e5,stroke:#ff6666
+    style D2 fill:#ffe5e5,stroke:#ff6666
+    style D3 fill:#ffe5e5,stroke:#ff6666
+    style D4 fill:#ffcccc,stroke:#ff0000,stroke-width:3px

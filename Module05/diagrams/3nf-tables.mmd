@@ -1,0 +1,45 @@
+graph LR
+    subgraph "3NF - Third Normal Form (No Transitive Dependencies)"
+        A["<b>Students</b><br/>PK: StudentID<br/>---<br/>StudentID<br/>StudentName<br/>StudentEmail<br/>MajorID (FK)<br/>AdvisorID (FK)"]
+        
+        B["<b>Majors</b><br/>PK: MajorID<br/>---<br/>MajorID<br/>MajorName<br/>DepartmentID (FK)"]
+        
+        C["<b>Departments</b><br/>PK: DepartmentID<br/>---<br/>DepartmentID<br/>DepartmentName<br/>Building<br/>DeanName"]
+        
+        D["<b>Advisors</b><br/>PK: AdvisorID<br/>---<br/>AdvisorID<br/>AdvisorName<br/>Office<br/>Phone<br/>DepartmentID (FK)"]
+        
+        E["<b>Courses</b><br/>PK: CourseID<br/>---<br/>CourseID<br/>CourseName<br/>Credits<br/>DepartmentID (FK)<br/>InstructorID (FK)"]
+        
+        F["<b>Instructors</b><br/>PK: InstructorID<br/>---<br/>InstructorID<br/>InstructorName<br/>Office<br/>Email<br/>DepartmentID (FK)"]
+        
+        G["<b>Enrollments</b><br/>PK: EnrollmentID<br/>---<br/>StudentID (FK)<br/>CourseID (FK)<br/>Grade<br/>Semester<br/>Year<br/>Status"]
+    end
+    
+    A -->|"majors in"| B
+    B -->|"belongs to"| C
+    A -->|"advised by"| D
+    D -->|"works in"| C
+    E -->|"offered by"| C
+    E -->|"taught by"| F
+    F -->|"works in"| C
+    G -->|"student"| A
+    G -->|"course"| E
+    
+    H[✅ No Transitive Dependencies]
+    I[✅ Each Fact Stored Once]
+    J[✅ No Update Anomalies]
+    
+    A --> H
+    A --> I
+    A --> J
+    
+    style A fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style B fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style C fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style D fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style E fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style F fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style G fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style H fill:#ccffcc,stroke:#00aa00
+    style I fill:#ccffcc,stroke:#00aa00
+    style J fill:#ccffcc,stroke:#00aa00

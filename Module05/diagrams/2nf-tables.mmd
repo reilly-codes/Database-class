@@ -1,0 +1,23 @@
+graph LR
+    subgraph "2NF - Second Normal Form (No Partial Dependencies)"
+        A["<b>Students</b><br/>PK: StudentID<br/>---<br/>StudentID<br/>StudentName<br/>StudentEmail<br/>Major<br/>MajorDept<br/>AdvisorName<br/>AdvisorOffice<br/>AdvisorPhone"]
+        
+        B["<b>Courses</b><br/>PK: CourseID<br/>---<br/>CourseID<br/>CourseName<br/>Credits<br/>Department"]
+        
+        C["<b>Enrollments</b><br/>PK: (StudentID, CourseID)<br/>---<br/>StudentID (FK)<br/>CourseID (FK)<br/>Grade<br/>Semester<br/>Year"]
+    end
+    
+    C -->|"enrolls"| A
+    C -->|"in"| B
+    
+    D[✅ No Partial Dependencies]
+    E[❌ Transitive Dependencies]
+    
+    A --> E
+    E --> F["Major → MajorDept<br/>AdvisorName → Office"]
+    
+    style A fill:#ffffcc,stroke:#ffaa00,stroke-width:2px
+    style B fill:#ffffcc,stroke:#ffaa00,stroke-width:2px
+    style C fill:#ffffcc,stroke:#ffaa00,stroke-width:2px
+    style D fill:#ccffcc,stroke:#00aa00
+    style E fill:#ffeeee,stroke:#ff6666

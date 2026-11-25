@@ -1,0 +1,52 @@
+graph TB
+    subgraph "Update Scenario: Move cnc-02 from Gütersloh to Bielefeld"
+        A["<b>Business Event</b><br/>Machine cnc-02 relocates<br/>to Bielefeld facility"]
+    end
+    
+    subgraph "Normalized Schema Update (3NF)"
+        B["<b>machine Table</b><br/>50 rows total<br/>Find: machine_id = 'cnc-02'<br/>Update: site = 'Bielefeld'"]
+        
+        C["<b>Result</b><br/>✅ 1 row updated<br/>✅ Time: < 1 ms<br/>✅ All jobs automatically reference new site<br/>✅ Foreign key integrity preserved"]
+        
+        D["<b>job Table</b><br/>20,000 rows<br/>No changes needed<br/>References machine via FK"]
+    end
+    
+    A --> B
+    B --> C
+    B -.->|"Foreign Key"| D
+    
+    subgraph "Denormalized Schema Update"
+        E["<b>report_jobpart Table</b><br/>200,000 rows total<br/>Find: machine_id = 'cnc-02'<br/>Update: site = 'Bielefeld' in ALL rows"]
+        
+        F["<b>Result</b><br/>❌ ~4,000 rows updated<br/>❌ Time: 20-40 ms<br/>❌ Must update each occurrence<br/>❌ Risk of partial update (if crash)"]
+        
+        G["<b>Write Amplification</b><br/>1 fact change = 4,000 row updates<br/>4,000× more I/O operations<br/>4,000× more disk writes<br/>4,000× more transaction log entries"]
+    end
+    
+    A --> E
+    E --> F
+    F --> G
+    
+    subgraph "The Update Anomaly - Quantified"
+        H["<b>Normalized</b><br/>Change 1 row<br/>Write 1 page<br/>Touch 1 index entry<br/><b>Total: 1× cost</b>"]
+        
+        I["<b>Denormalized</b><br/>Change 4,000 rows<br/>Write ~400 pages<br/>Touch 4,000 index entries<br/><b>Total: 4,000× cost</b>"]
+        
+        J["<b>At Production Scale (20M rows)</b><br/>Normalized: 1 row<br/>Denormalized: 400,000 rows<br/><b>400,000× amplification!</b>"]
+    end
+    
+    C --> H
+    F --> I
+    H --> J
+    I --> J
+    
+    style A fill:#e5f2ff,stroke:#0066cc,stroke-width:2px
+    style B fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style C fill:#ccffcc,stroke:#00aa00,stroke-width:3px
+    style D fill:#f0f0f0,stroke:#666666
+    style E fill:#ffeecc,stroke:#ff9900,stroke-width:2px
+    style F fill:#ffcccc,stroke:#ff6666,stroke-width:3px
+    style G fill:#ffcccc,stroke:#ff0000,stroke-width:2px
+    style H fill:#ccffcc,stroke:#00aa00
+    style I fill:#ffcccc,stroke:#ff6666
+    style J fill:#fff0f0,stroke:#ff0000,stroke-width:3px

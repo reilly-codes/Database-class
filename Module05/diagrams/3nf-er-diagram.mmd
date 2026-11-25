@@ -1,0 +1,65 @@
+erDiagram
+    STUDENTS ||--o{ ENROLLMENTS : "enrolls in"
+    COURSES ||--o{ ENROLLMENTS : "offered as"
+    STUDENTS }o--|| MAJORS : "majors in"
+    STUDENTS }o--|| ADVISORS : "advised by"
+    MAJORS }o--|| DEPARTMENTS : "belongs to"
+    COURSES }o--|| DEPARTMENTS : "offered by"
+    COURSES }o--|| INSTRUCTORS : "taught by"
+    ADVISORS }o--|| DEPARTMENTS : "works in"
+    INSTRUCTORS }o--|| DEPARTMENTS : "works in"
+    
+    STUDENTS {
+        string StudentID PK
+        string StudentName
+        string StudentEmail
+        string MajorID FK
+        string AdvisorID FK
+    }
+    
+    MAJORS {
+        string MajorID PK
+        string MajorName
+        string DepartmentID FK
+    }
+    
+    DEPARTMENTS {
+        string DepartmentID PK
+        string DepartmentName
+        string Building
+        string DeanName
+    }
+    
+    ADVISORS {
+        string AdvisorID PK
+        string AdvisorName
+        string Office
+        string Phone
+        string DepartmentID FK
+    }
+    
+    COURSES {
+        string CourseID PK
+        string CourseName
+        int Credits
+        string DepartmentID FK
+        string InstructorID FK
+    }
+    
+    INSTRUCTORS {
+        string InstructorID PK
+        string InstructorName
+        string Office
+        string Email
+        string DepartmentID FK
+    }
+    
+    ENROLLMENTS {
+        string EnrollmentID PK
+        string StudentID FK
+        string CourseID FK
+        string Grade
+        string Semester
+        int Year
+        string Status
+    }

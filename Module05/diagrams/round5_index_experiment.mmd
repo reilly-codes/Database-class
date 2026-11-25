@@ -1,0 +1,72 @@
+graph TB
+    subgraph "Index Behavior: Query Scanning 67,000 Rows (33% of table)"
+        A["<b>Query with Date Filter</b><br/>SELECT machine_id, site, technician, SUM(part_price)<br/>FROM report_jobpart<br/>WHERE done_on >= '2026-03-01'<br/>GROUP BY machine_id, technician"]
+    end
+    
+    subgraph "Scenario 1: WITH Index (ix_report_machine)"
+        B1["<b>Step 1: Index Scan</b><br/>Walk ix_report_done_on B-tree<br/>Find all rows with done_on >= '2026-03-01'<br/>Result: ~67,000 row pointers"]
+        
+        B2["<b>Step 2: Table Lookups</b><br/>For each pointer:<br/>- Jump to table page<br/>- Read row data<br/>67,000 random I/O operations"]
+        
+        B3["<b>Step 3: Aggregation</b><br/>Build temporary B-tree for GROUP BY<br/>Sum part_price per group"]
+        
+        B4["<b>Result: 40-50 ms</b><br/>❌ Two I/O passes (index + table)<br/>❌ Random access pattern<br/>❌ Poor cache locality<br/>❌ Each fetch loads a page, uses 1 row"]
+    end
+    
+    A --> B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> B4
+    
+    subgraph "Scenario 2: WITHOUT Index (Dropped)"
+        C1["<b>Step 1: Sequential Table Scan</b><br/>Read report_jobpart pages in order<br/>Filter done_on >= '2026-03-01' during scan<br/>Process ~200,000 rows sequentially"]
+        
+        C2["<b>Step 2: Aggregation</b><br/>Build temporary B-tree for GROUP BY<br/>Sum part_price per group<br/>(same as with index)"]
+        
+        C3["<b>Result: 20-30 ms</b><br/>✅ Single I/O pass (table only)<br/>✅ Sequential access pattern<br/>✅ Excellent cache locality<br/>✅ Each page load processes multiple rows"]
+    end
+    
+    A --> C1
+    C1 --> C2
+    C2 --> C3
+    
+    subgraph "Why Sequential Scan Wins"
+        D1["<b>Index Scan Cost</b><br/>Read index pages: 10 ms<br/>Random table lookups: 25 ms<br/>Aggregation: 10 ms<br/><b>Total: 45 ms</b>"]
+        
+        D2["<b>Sequential Scan Cost</b><br/>Read all table pages: 15 ms<br/>Filter during scan: included<br/>Aggregation: 10 ms<br/><b>Total: 25 ms</b>"]
+        
+        D3["<b>The Tipping Point</b><br/>Index helps: < 5% of rows<br/>Marginal: 5-20% of rows<br/>Index hurts: > 20% of rows<br/><br/><b>Our query: 33% of rows</b><br/>→ Sequential scan wins"]
+    end
+    
+    B4 --> D1
+    C3 --> D2
+    D1 --> D3
+    D2 --> D3
+    
+    subgraph "When to Use Indexes"
+        E1["<b>Indexes HELP</b><br/>✅ Point lookups (WHERE id = 'cnc-01')<br/>✅ Small result sets (< 5% of table)<br/>✅ Exact matches on selective columns<br/>✅ JOIN on foreign keys<br/><b>Example:</b> Find jobs for one machine"]
+        
+        E2["<b>Indexes HURT</b><br/>❌ Large scans (> 20% of table)<br/>❌ Range queries on common values<br/>❌ Full table aggregations<br/>❌ Queries needing most rows anyway<br/><b>Example:</b> Dashboard aggregates"]
+        
+        E3["<b>Index Overhead</b><br/>Storage cost: +20-30% per index<br/>Write cost: Update index on every INSERT/UPDATE<br/>Maintenance: ANALYZE needed for statistics<br/><b>Measure before indexing!</b>"]
+    end
+    
+    D3 --> E1
+    D3 --> E2
+    E1 --> E3
+    E2 --> E3
+    
+    style A fill:#e5f2ff,stroke:#0066cc,stroke-width:2px
+    style B1 fill:#fff5e5,stroke:#ff9900
+    style B2 fill:#fff5e5,stroke:#ff9900
+    style B3 fill:#f0f0f0,stroke:#666666
+    style B4 fill:#ffcccc,stroke:#ff6666,stroke-width:2px
+    style C1 fill:#e5ffe5,stroke:#00aa00
+    style C2 fill:#f0f0f0,stroke:#666666
+    style C3 fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style D1 fill:#ffeeee,stroke:#ff6666
+    style D2 fill:#eeffee,stroke:#00aa00
+    style D3 fill:#fff0f0,stroke:#ff0000,stroke-width:3px
+    style E1 fill:#ccffcc,stroke:#00aa00
+    style E2 fill:#ffcccc,stroke:#ff6666
+    style E3 fill:#fff5e5,stroke:#ff9900,stroke-width:2px

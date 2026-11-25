@@ -1,0 +1,25 @@
+graph TD
+    subgraph "0NF - Unnormalized Form (The Problematic Spreadsheet)"
+        A["<b>Student Enrollment Spreadsheet</b><br/>---<br/>StudentID | StudentName | StudentEmail<br/>Major | MajorDept | AdvisorName<br/>AdvisorOffice | AdvisorPhone<br/><b>Courses (comma-separated)</b><br/><b>Grades (comma-separated)</b>"]
+    end
+    
+    B[❌ Repeating Groups]
+    C[❌ Update Anomalies]
+    D[❌ Insert Anomalies]
+    E[❌ Delete Anomalies]
+    
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    
+    B --> F["'CS101, CS201, MATH150'<br/>Multiple values in one cell"]
+    C --> G["Change advisor office<br/>→ Update multiple rows"]
+    D --> H["Cannot add course<br/>without student"]
+    E --> I["Delete student<br/>→ Lose advisor info"]
+    
+    style A fill:#ffcccc,stroke:#ff0000,stroke-width:3px
+    style B fill:#ffeeee,stroke:#ff6666
+    style C fill:#ffeeee,stroke:#ff6666
+    style D fill:#ffeeee,stroke:#ff6666
+    style E fill:#ffeeee,stroke:#ff6666

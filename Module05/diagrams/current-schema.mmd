@@ -1,0 +1,17 @@
+erDiagram
+    FLAT_JOBPART {
+        int job_id
+        string machine_id
+        string site
+        string technician
+        string part_no
+        decimal part_price
+        date done_on
+    }
+    
+    FLAT_JOBPART ||--|| FLAT_JOBPART : "job_id → machine_id"
+    FLAT_JOBPART ||--|| FLAT_JOBPART : "job_id → technician"
+    FLAT_JOBPART ||--|| FLAT_JOBPART : "machine_id → site"
+    FLAT_JOBPART ||--|| FLAT_JOBPART : "part_no → part_price"
+    FLAT_JOBPART ||--|| FLAT_JOBPART : "(job_id, part_no) PK"
+

@@ -1,0 +1,25 @@
+graph TD
+    subgraph "1NF - First Normal Form (Atomic Values Only)"
+        A["<b>StudentEnrollment Table (1NF)</b><br/>---<br/>PK: (StudentID, CourseID)<br/>---<br/>StudentID | StudentName | StudentEmail<br/>Major | MajorDept | AdvisorName<br/>AdvisorOffice | AdvisorPhone<br/>CourseID | CourseName | Grade"]
+    end
+    
+    B[✅ No Repeating Groups]
+    C[✅ Atomic Values]
+    D[❌ Massive Redundancy]
+    E[❌ Partial Dependencies]
+    
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    
+    B --> F["Each course = separate row<br/>No comma-separated lists"]
+    C --> G["Single value per cell<br/>One grade per row"]
+    D --> H["Emma's info repeated 3×<br/>Dr. Wilson's office repeated 5×"]
+    E --> I["CourseName depends on<br/>CourseID only (not full key)"]
+    
+    style A fill:#ffffcc,stroke:#ffaa00,stroke-width:3px
+    style B fill:#ccffcc,stroke:#00aa00
+    style C fill:#ccffcc,stroke:#00aa00
+    style D fill:#ffeeee,stroke:#ff6666
+    style E fill:#ffeeee,stroke:#ff6666

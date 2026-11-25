@@ -1,0 +1,43 @@
+graph TB
+    subgraph "2NF - Still Has Transitive Dependency"
+        A["<b>STUDENT_ADVISOR Table (2NF but NOT 3NF)</b><br/>PK: student_id<br/>---<br/>student_id | student_name<br/>advisor_id | advisor_office"]
+        
+        B["✅ In 2NF because:<br/>Single-attribute PK<br/>No partial dependencies<br/>All attributes depend on full key"]
+        
+        C["❌ NOT in 3NF because:<br/>Transitive dependency exists<br/>student_id → advisor_id → advisor_office<br/>advisor_office depends on advisor_id<br/>not directly on student_id"]
+    end
+    
+    A --> B
+    A --> C
+    
+    subgraph "Problem Demonstration"
+        D["Update Anomaly:<br/>Change ADV-01's office<br/>Must update Emma AND Marcus rows"]
+        
+        E["Sample Data:<br/>1001 | Emma | ADV-01 | ENG-301<br/>1002 | Marcus | ADV-01 | ENG-301<br/>1003 | Aisha | ADV-02 | SCI-210"]
+    end
+    
+    C --> D
+    A --> E
+    
+    subgraph "3NF - Transitive Dependency Eliminated"
+        F["<b>Students Table</b><br/>PK: student_id<br/>---<br/>student_id | student_name<br/>advisor_id (FK)"]
+        
+        G["<b>Advisors Table</b><br/>PK: advisor_id<br/>---<br/>advisor_id | advisor_office"]
+        
+        F -->|"advised by"| G
+        
+        H["✅ Now in 3NF:<br/>No transitive dependencies<br/>Office stored once per advisor<br/>Update office = 1 row change"]
+    end
+    
+    A -.->|"Decompose"| F
+    A -.->|"Decompose"| G
+    G --> H
+    
+    style A fill:#ffffcc,stroke:#ffaa00,stroke-width:3px
+    style B fill:#ccffcc,stroke:#00aa00
+    style C fill:#ffcccc,stroke:#ff6666
+    style D fill:#ffeeee,stroke:#ff6666
+    style E fill:#f0f0f0,stroke:#666666
+    style F fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style G fill:#ccffcc,stroke:#00aa00,stroke-width:2px
+    style H fill:#ccffcc,stroke:#00aa00

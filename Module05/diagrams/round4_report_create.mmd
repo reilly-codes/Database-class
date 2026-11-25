@@ -1,0 +1,35 @@
+graph TB
+    subgraph "Creating Denormalized Report Table"
+        A["<b>CREATE TABLE AS SELECT</b><br/>Materializes join result<br/>into physical table"]
+        
+        B["<b>Source: 4 Normalized Tables</b><br/>machine (50 rows)<br/>part (40 rows)<br/>job (20k rows)<br/>job_part (200k rows)"]
+        
+        C["<b>Join Query</b><br/>SELECT j.job_id, m.machine_id,<br/>m.site, j.technician, jp.part_no,<br/>p.part_price, j.done_on<br/>FROM job j<br/>JOIN machine m ON ...<br/>JOIN job_part jp ON ...<br/>JOIN part p ON ..."]
+        
+        D["<b>Result: report_jobpart</b><br/>200,000 rows<br/>All attributes flattened<br/>site, technician, price copied"]
+    end
+    
+    B --> C
+    C --> A
+    A --> D
+    
+    subgraph "Redundancy Example"
+        E["<b>cnc-01 at Gütersloh</b><br/>Appears in ~4,000 rows<br/>Site 'Gütersloh' repeated 4,000×<br/>tech-0 name repeated 4,000×"]
+        
+        F["<b>In Normalized Schema</b><br/>machine table: 1 row (cnc-01, Gütersloh)<br/>Referenced by foreign key<br/>Site stored ONCE"]
+    end
+    
+    D --> E
+    E -.->|"Compare to"| F
+    
+    G["<b>Indexes Created</b><br/>ix_report_machine (machine_id)<br/>ix_report_done_on (done_on)<br/>Speed up filtering"]
+    
+    D --> G
+    
+    style A fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style B fill:#f0f0f0,stroke:#666666
+    style C fill:#fff5cc,stroke:#ffaa00
+    style D fill:#ccffcc,stroke:#00aa00,stroke-width:3px
+    style E fill:#ffcccc,stroke:#ff6666
+    style F fill:#ccffcc,stroke:#00aa00
+    style G fill:#e5ccff,stroke:#9933ff
