@@ -7,6 +7,18 @@ In this module, instead of designing a database from scratch, I worked through a
 
 ---
 
+## 🎯 Learning Goals
+
+| # | Official Learning Goal | Where Proven in Portfolio |
+|---|---|---|
+| **1** | Reconstruct an **ER/EER model** (entities, attributes, keys, relationships, cardinalities) from an undocumented SQL schema. | [Task 1: Reconstructing the ER Model](#task-1-reconstructing-the-er-model) |
+| **2** | Identify **integrity defects** — missing foreign keys, orphan rows, redundant data, normalization violations — with queries, not intuition. | [Task 2: Finding Integrity Defects With Queries](#task-2-finding-integrity-defects-with-queries) |
+| **3** | Distinguish an **entity relationship** from an attribute, and a **surrogate key** from a natural key, and justify the choice. | [Pod Study: Key Concepts & Pointers](#pod-study-key-concepts--pointers) |
+| **4** | Express a schema as a **code-first data contract** (Pydantic / SQLAlchemy) that an application can enforce. | [Task 3: Writing the Data Contract in Code](#task-3-writing-the-data-contract-in-code) |
+| **5** | Write the **requirements the schema forgot**: the business rules nobody encoded. | [Task 1 Business Rules](#task-1-reconstructing-the-er-model) & [Task 3 Validation Rules](#how-constraints-are-split) |
+
+---
+
 ## Pod Study: Key Concepts & Pointers
 
 Here is my breakdown of the core modeling concepts from the self-study:

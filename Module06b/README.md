@@ -7,6 +7,18 @@ In this module, I evaluated the trade-offs of polyglot persistence across Kortma
 
 ---
 
+## 🎯 Learning Goals
+
+| # | Official Learning Goal | Where Proven in Portfolio |
+|---|---|---|
+| **1** | Store **semi-structured data (JSON)** in SQLite and query it with `json_extract`/`json_each` and an **expression index**. | [Task 2 — The Shape (Schemaless JSON)](#task-2--the-shape-schemaless-json) |
+| **2** | Implement and evaluate a **key-value access pattern** against SQLite. | [Task 3 — The Decision Record & KV Store Analysis](#task-3--the-decision-record) |
+| **3** | Explain **ACID vs. BASE** and the **CAP theorem** in terms of the systems you actually ran. | [Theory Summary: ACID, BASE, and CAP Theorem](#1-acid-base-and-the-cap-theorem) |
+| **4** | Choose an engine per workload and **defend the choice with a measurement**. | [Task 3 — The One-Page Decision Record](#the-one-page-decision-record-for-kortmann) |
+| **5** | Say what changes — and what gets harder — when the same data lives on a **server**. | [Task 1 — The Boundary (Local vs. Remote)](#task-1--the-boundary-local-vs-remote) |
+
+---
+
 ## Navigation & Sections
 - [Task 1 — The Boundary (Local vs. Remote)](#task-1--the-boundary-local-vs-remote)
 - [Task 2 — The Shape (Schemaless JSON)](#task-2--the-shape-schemaless-json)

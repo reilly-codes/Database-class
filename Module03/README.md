@@ -7,6 +7,18 @@ In this module, I worked with a warehouse dataset of ~240,000 order lines to pro
 
 ---
 
+## 🎯 Learning Goals
+
+| # | Official Learning Goal | Where Proven in Portfolio |
+|---|---|---|
+| **1** | Build complex **DQL** queries: joins, aggregation with `GROUP BY`/`HAVING`, subqueries, and window functions. | [Task 1: LLM Query](#task-1-ask-the-llm-then-check-the-plan) & [Task 5: Stretcher](#task-5-stretcher-window-functions--subquery-rewrites) |
+| **2** | Read **`EXPLAIN QUERY PLAN`** as *primary evidence*: say what the engine will do for a given query, tell a `SCAN` from a `SEARCH`, and a table lookup from a covering index. | [Pod Study: Reading Query Plans](#reading-query-plans) & [Plan Prediction vs. Actual Plan](#plan-prediction-vs-actual-plan) |
+| **3** | **Benchmark** the effect of an index and explain when the planner ignores one. | [Task 2: Index Benchmark](#task-2-index-benchmark-prove-it-or-disprove-it) |
+| **4** | Generate a query with an **LLM**, then **verify** it: correctness, performance, and edge cases. | [Task 1: Ask the LLM, Then Check the Plan](#task-1-ask-the-llm-then-check-the-plan) |
+| **5** | **Prevent SQL injection** with bound parameters and demonstrate why string concatenation is exploitable. | [Task 3: The Injection Drill](#task-3-the-injection-drill) |
+
+---
+
 ## Pod Study: The Six Clauses & Query Plans
 
 SQL queries are written in one order, but evaluated by the engine in a different order:

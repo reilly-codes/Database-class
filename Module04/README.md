@@ -7,6 +7,18 @@ In this module, I worked on enforcing data integrity directly at the edge in `Mo
 
 ---
 
+## 🎯 Learning Goals
+
+| # | Official Learning Goal | Where Proven in Portfolio |
+|---|---|---|
+| **1** | Create tables with the full constraint toolkit: `NOT NULL`, `UNIQUE`, `CHECK`, `PRIMARY KEY`, `FOREIGN KEY`, and `STRICT` typing. | [Setup: The Edge Schema](#setup-the-edge-schema) & [Task 1: Proving Constraints Work](#task-1-proving-constraints-work) |
+| **2** | Use **generated columns** to derive values at the engine instead of in application code. | [Setup: Schema Definition (`energy_j`)](#setup-the-edge-schema) & [Task 1 Evidence](#task-1-proving-constraints-work) |
+| **3** | Write **triggers** that enforce domain rules and maintain audit/rollup tables automatically. | [Task 3: Triggers for Alarms and Audits](#task-3-triggers-for-alarms-and-audits) |
+| **4** | Use **DML** correctly — including `UPSERT` (`ON CONFLICT`) for idempotent edge ingestion. | [Task 2: Idempotent Ingestion with UPSERT](#task-2-idempotent-ingestion-with-upsert) |
+| **5** | Reason about **access control (DCL)**: who may read or write, and how that maps from server `GRANT`s to an embedded, local-first world. | [Task 4: Access Control Without a Server](#task-4-access-control-without-a-server) |
+
+---
+
 ## Pod Study: The Three Layers of Integrity
 
 Integrity is structured in three defensive layers:

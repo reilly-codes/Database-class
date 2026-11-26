@@ -7,6 +7,18 @@ In this module, I investigated why operational databases struggle with historica
 
 ---
 
+## 🎯 Learning Goals
+
+| # | Official Learning Goal | Where Proven in Portfolio |
+|---|---|---|
+| **1** | Move a table out of SQLite into **Parquet** reproducibly, from a script. | [2. Converting to Parquet & Verifying Parity](#2-converting-to-parquet--verifying-parity) |
+| **2** | Run the **same aggregate** in SQLite and DuckDB and report the difference honestly (interleaved runs, median). | [3. The Race: SQLite vs. DuckDB](#3-the-race-sqlite-vs-duckdb) |
+| **3** | Read **`EXPLAIN ANALYZE`** and name the operator and row count that dominate. | [4. Execution Plan Analysis](#4-execution-plan-analysis) |
+| **4** | State, with a number, **where DuckDB is the wrong engine**. | [5. The Boundary: Where DuckDB is the Wrong Engine](#5-the-boundary-where-duckdb-is-the-wrong-engine) |
+| **5** | Recommend **what moves to the analytical copy** and how that copy stays fresh. | [6. Decision Memo & Refresh Pipeline](#6-decision-memo--refresh-pipeline) |
+
+---
+
 ## Architecture: Row-Oriented vs. Columnar
 
 ![Row-Oriented vs Columnar](pictures/oltp-vs-olap.png)

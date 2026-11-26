@@ -1,6 +1,24 @@
-# Module 1
+# Module 1 — Introduction & Local-First Foundations
 
-Module description
+**Portfolio of:** Trainn  
+**Class:** HSBI Database Class  
+
+In this opening module, I set up the reproducible local toolchain (`uv`, Python, SQLite, DuckDB, Datasette), initialized the portfolio repository, explored embedded vs. client/server database architectures, and tested my first SQL queries with parameter binding and LLM query verification.
+
+---
+
+## 🎯 Learning Goals
+
+| # | Official Learning Goal | Where Proven in Portfolio |
+|---|---|---|
+| **1** | Explain how this class works — the CBL/PBL philosophy, the portfolio-based **project work** assessment, and the "moving bar" of a first-time course. | [Task Inspirations & Class Structure](#task-inspirations) |
+| **2** | Set up your personal GitHub portfolio from the course template, with a clean first commit and a `.gitignore` that keeps databases and secrets out of Git. | [Task Personal Profile](#task-personal-profile) & [Root `.gitignore`](../.gitignore) |
+| **3** | Set up the entire toolchain reproducibly with **`uv`** — one fixed Python plus SQLite, DuckDB, Datasette, and more — on Windows, macOS, or Linux, and verify it. | [Root `pyproject.toml`](../pyproject.toml) & [Toolchain Evidence](pictures/README.md) |
+| **4** | Explain — with a measurement, not a slide — the difference between an **embedded** database and a **client/server** database, and why most local apps should not run a server. | [Task What is IoT](#task-what-is-iot) & [Telemetry DB Size Proof](pictures/README.md#pictures-for-module-1) |
+| **5** | Load real rows into SQLite and query them from Python using **bound parameters**. | [Ingestion Script (`load_telemetry.py`)](load_telemetry.py) & [Queries (`queries.sql`)](queries.sql) |
+| **6** | Take a first LLM-generated query, run it, and begin the habit that defines this course: **verify before you trust**. | [Query Verification & Plan Proof](pictures/README.md) & [Reflection 1](/Reflections/ref01.md) |
+
+---
 
 ## Task Inspirations
 

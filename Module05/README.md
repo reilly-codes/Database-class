@@ -7,6 +7,18 @@ In this module, I investigated the trade-offs between a fully normalized databas
 
 ---
 
+## 🎯 Learning Goals
+
+| # | Official Learning Goal | Where Proven in Portfolio |
+|---|---|---|
+| **1** | Derive **functional dependencies** from a relation and identify candidate keys. | [Round 1: Functional Dependencies & Redundancy](#round-1-functional-dependencies--redundancy) |
+| **2** | Normalize a relation to **1NF, 2NF, and 3NF**, explaining the anomaly each step removes. | [Round 2: The 3 Anomalies](#round-2-breaking-the-flat-table-the-3-anomalies) & [Round 3: Normalizing to 3NF](#round-3-normalizing-to-3nf) |
+| **3** | **Denormalize deliberately** to speed up a hot read path, and predict what it costs on writes and storage. | [Round 4: Racing Queries](#round-4-racing-normalized-vs-denormalized-queries) & [Round 5: Hidden Price](#round-5-the-hidden-price-of-denormalization) |
+| **4** | **Measure** the trade-off: query latency, write cost, and database size — before and after. | [Round 4 Benchmark Table](#round-4-racing-normalized-vs-denormalized-queries) & [Round 5 Update & Disk Cost](#round-5-the-hidden-price-of-denormalization) |
+| **5** | Decide, and *defend*, where a schema should sit on the normalization spectrum for a given workload. | [Summary Decision Framework](#summary-decision-framework) |
+
+---
+
 ## Round 1: Functional Dependencies & Redundancy
 
 We started with a single flat table holding maintenance jobs, machines, technicians, and parts:
