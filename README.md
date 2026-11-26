@@ -32,6 +32,8 @@ My personal profile and expectations, you can find [here](Module01/README.md#tas
   [Reflection 5](Reflections/ref05.md)
 - [Module 6a: The Analytical Engine (DuckDB)](Module06a/README.md),
   [Reflection 6a](Reflections/ref06a.md)
+- [Module 6b: Polyglot Persistence & the Decision](Module06b/README.md),
+  [Reflection 6b](Reflections/ref06b.md)
 
 ## Miscellaneous
 
