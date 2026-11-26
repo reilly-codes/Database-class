@@ -27,3 +27,4 @@ As a reminder, we expect the following in a reflection:
 - [Reflection 3 (Module 3)](ref03.md)
 - [Reflection 4 (Module 4)](ref04.md)
 - [Reflection 5 (Module 5)](ref05.md)
+- [Reflection 6a (Module 6a)](ref06a.md)
